@@ -6,4 +6,27 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Contexts\Categories\Repositories\" />
+    <Folder Include="Contexts\Categories\Services\" />
+    <Folder Include="Contexts\Comments\Repositories\" />
+    <Folder Include="Contexts\Comments\Services\" />
+    <Folder Include="Contexts\Files\Repositories\" />
+    <Folder Include="Contexts\Files\Services\" />
+    <Folder Include="Contexts\Messages\Repositories\" />
+    <Folder Include="Contexts\Messages\Services\" />
+    <Folder Include="Contexts\Users\Repositories\" />
+    <Folder Include="Contexts\Users\Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Board.Contracts\Board.Contracts.csproj" />
+    <ProjectReference Include="..\Board.Domain\Board.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
