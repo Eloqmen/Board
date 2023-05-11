@@ -11,7 +11,7 @@ namespace Board.Application.AppData.Services
     {
         public string[] GetForbiddenWords()
         {
-            return new[] { "дурак", "реклама", "взятка" };
+            return new[] { "дурак", "реклама", "взятка", "мяу" };
         }
     }
 }

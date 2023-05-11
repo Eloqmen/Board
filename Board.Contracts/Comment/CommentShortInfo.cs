@@ -1,5 +1,4 @@
-﻿using Board.Contracts.User;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +7,9 @@ using System.Threading.Tasks;
 namespace Board.Contracts.Comment
 {
     /// <summary>
-    /// Отзыв
+    /// Краткая информация об коментарии.
     /// </summary>
-    public class CommentInfoDto
+    public class CommentShortInfo
     {
         /// <summary>
         /// Индификатор Отзыва

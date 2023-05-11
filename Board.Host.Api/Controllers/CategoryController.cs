@@ -1,150 +1,157 @@
-﻿using Board.Application.AppData.Contexts.Adverts.Services;
-using Board.Contracts.Advert;
+﻿using Board.Application.AppData.Contexts.Categories.Services;
 using Board.Contracts;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.JsonPatch;
+using Board.Contracts.Category;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Board.Host.Api.Controllers
 {
     /// <summary>
-    /// Контроллер для работы с объявлениями.
+    /// Контроллер для работы с категориями.
     /// </summary>
     /// <response code="500">Произошла внутренняя ошибка.</response>
     [ApiController]
     [Route("[controller]")]
     [Produces("application/json")]
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status500InternalServerError)]
-    public class AdvertController : Controller
+    public class CategoryController : Controller
     {
-        private readonly IAdvertService _advertService;
-        private readonly ILogger<AdvertController> _logger;
+        private readonly ILogger<CategoryController> _logger;
+        private readonly ICategoryService _categoryService;
 
         /// <summary>
-        /// Инициализирует экземпляр <see cref="AdvertController"/>
+        /// Инициализирует экземпляр <see cref="CategoryController"/>
         /// </summary>
         /// <param name="logger">Сервис логирования.</param>
-        /// <param name="advertService">Сервис для работы с объявлениями.</param>
-        public AdvertController(ILogger<AdvertController> logger, IAdvertService advertService)
+        /// <param name="categoryService">Сервис категорий.</param>
+        public CategoryController(ILogger<CategoryController> logger, ICategoryService categoryService)
         {
             _logger = logger;
-            _advertService = advertService;
+            _categoryService = categoryService;
         }
 
         /// <summary>
-        /// Получить список объявлений.
+        /// Получить список категорий.
         /// </summary>
         /// <param name="cancellationToken">Токен отмены.</param>
         /// <response code="200">Запрос выполнен успешно</response>
-        /// <returns>Список моделей объявлений.</returns>
+        /// <returns>Список моделей категорий.</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<AdvertShortInfoDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<CategoryShortInfoDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Запрос списка объявлений");
-            var result = await _advertService.GetAll(cancellationToken);
+            _logger.LogInformation("Запрос категорий");
+
+            var result = await _categoryService.GetActiveAsync(cancellationToken);
             return Ok(result);
         }
 
         /// <summary>
-        /// Получить объявление по идентификатору.
+        /// Получить категорию по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор.</param>
         /// <param name="cancellationToken">Токен отмены.</param>
         /// <response code="200">Запрос выполнен успешно.</response>
-        /// <response code="404">Объявление с указанным идентификатором не найдено.</response>
-        /// <returns>Модель объявления.</returns>
+        /// <response code="404">Категория с указанным идентификатором не найдена.</response>
+        /// <returns>Модель категории.</returns>
         [HttpGet("{id:Guid}")]
-        [ProducesResponseType(typeof(AdvertInfoDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CategoryInfoDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Запрос объявления по идентификатору: {id}");
-            var result = await _advertService.Get(id, cancellationToken);
-
-            if (result == null)
-            {
-                return NotFound();
-            }
-
+            var result = await _categoryService.GetByIdAsync(id, cancellationToken);
             return Ok(result);
         }
 
         /// <summary>
-        /// Создать новое объявление.
+        /// Получить список активных категорий.
         /// </summary>
-        /// <param name="dto">Модель создания объявления.</param>
         /// <param name="cancellationToken">Токен отмены.</param>
-        /// <response code="201">Объявление успешно создано.</response>
+        /// <response code="200">Запрос выполнен успешно.</response>
+        /// <response code="404">Категория с указанным идентификатором не найдена.</response>
+        /// <returns>Модель категории.</returns>
+        [HttpGet("active")]
+        [ProducesResponseType(typeof(CategoryInfoDto[]), StatusCodes.Status200OK)]
+        [Authorize]
+        public async Task<IActionResult> GetActive(CancellationToken cancellationToken)
+        {
+            var result = await _categoryService.GetActiveAsync(cancellationToken);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Создать новую категорию.
+        /// </summary>
+        /// <param name="dto">Модель создания категории.</param>
+        /// <param name="cancellationToken">Токен отмены.</param>
+        /// <response code="201">Категория успешно создана.</response>
         /// <response code="400">Модель данных запроса невалидна.</response>
         /// <response code="422">Произошёл конфликт бизнес-логики.</response>
-        /// <returns>Модель созданного объявления.</returns>
+        /// <returns>Идентификатор созданной категории.</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(AdvertInfoDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status422UnprocessableEntity)]
         [Authorize]
-        public async Task<IActionResult> Create([FromBody] CreateAdvertDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Запрос на создание объявления: {JsonConvert.SerializeObject(dto)}");
-            var result = await _advertService.Add(dto, cancellationToken);
-            return CreatedAtAction(nameof(Create), new { result.Id });
+            var result = await _categoryService.CreateAsync(dto, cancellationToken);
+            return StatusCode((int)HttpStatusCode.Created, result);
         }
 
         /// <summary>
-        /// Обновить объявление.
+        /// Обновить категорию.
         /// </summary>
         /// <param name="id">Идентификатор.</param>
-        /// <param name="dto">Модель обновления объявления.</param>
+        /// <param name="dto">Модель обновления категории.</param>
         /// <param name="cancellationToken">Токен отмены.</param>
         /// <response code="200">Запрос выполнен успешно.</response>
         /// <response code="400">Модель данных запроса невалидна.</response>
         /// <response code="403">Доступ запрещён.</response>
         /// <response code="404">Объявление с указанным идентификатором не найдено.</response>
         /// <response code="422">Произошёл конфликт бизнес-логики.</response>
-        /// <returns>Модель обновлённого объявления.</returns>
+        /// <returns>Модель обновлённой категории.</returns>
         [HttpPut("{id:Guid}")]
-        [ProducesResponseType(typeof(AdvertInfoDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CategoryInfoDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status422UnprocessableEntity)]
         [Authorize]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAdvertDto dto, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryDto dto, CancellationToken cancellationToken)
         {
-            // TODO NotImplemented
-            return await Task.Run(() => Ok(new AdvertInfoDto()), cancellationToken);
+            return await Task.Run(() => Ok(new CategoryInfoDto()), cancellationToken);
         }
 
         /// <summary>
-        /// Частично обновить объявление.
+        /// Частично обновить категорию.
         /// </summary>
         /// <param name="id">Идентификатор.</param>
-        /// <param name="dto">Модель обновления объявления.</param>
+        /// <param name="dto">Модель обновления категории.</param>
         /// <param name="cancellationToken">Токен отмены.</param>
         /// <response code="200">Запрос выполнен успешно.</response>
         /// <response code="400">Модель данных запроса невалидна.</response>
         /// <response code="403">Доступ запрещён.</response>
         /// <response code="404">Объявление с указанным идентификатором не найдено.</response>
         /// <response code="422">Произошёл конфликт бизнес-логики.</response>
-        /// <returns>Модель обновлённого объявления.</returns>
+        /// <returns>Модель обновлённой категории.</returns>
         [HttpPatch("{id:Guid}")]
-        [ProducesResponseType(typeof(AdvertInfoDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CategoryInfoDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status422UnprocessableEntity)]
         [Authorize]
-        public async Task<IActionResult> Patch(Guid id, [FromBody] JsonPatchDocument<UpdateAdvertDto> dto,
+        public async Task<IActionResult> Patch(Guid id, [FromBody] JsonPatchDocument<UpdateCategoryDto> dto,
             CancellationToken cancellationToken)
         {
-            // TODO NotImplemented
-            return await Task.Run(() => Ok(new AdvertInfoDto()), cancellationToken);
+            return await Task.Run(() => Ok(new CategoryInfoDto()), cancellationToken);
         }
 
         /// <summary>
-        /// Удалить объявление по идентификатору.
+        /// Удалить категорию по идентификатору.
         /// </summary>
         /// <param name="id">Идентификатор.</param>
         /// <param name="cancellationToken">Токен отмены.</param>
@@ -156,9 +163,7 @@ namespace Board.Host.Api.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteById(Guid id, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Запрос на удаление объявления по идентификатору: {id}");
-            await _advertService.Delete(id, cancellationToken);
-            return NoContent();
+            return await Task.Run(NoContent, cancellationToken);
         }
     }
 }
