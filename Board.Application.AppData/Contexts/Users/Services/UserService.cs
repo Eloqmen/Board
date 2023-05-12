@@ -1,8 +1,12 @@
-﻿using Board.Application.AppData.Contexts.Users.Repositories;
+﻿using Board.Application.AppData.Contexts.Roles.Repositories;
+using Board.Application.AppData.Contexts.Users.Repositories;
+using Board.Application.AppData.Services;
 using Board.Contracts.User;
 using Board.Domain;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,15 +20,23 @@ namespace Board.Application.AppData.Contexts.Users.Services
         private readonly IUserRepository _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _сonfiguration;
-
+        private readonly IRoleRepository _roleRepository;
+        private readonly ILogger<UserService> _logger;
+        private IClaimAcessor _claimAccessor;
         public UserService(
+            IClaimAcessor acessor,
             IUserRepository userRepository,
             IHttpContextAccessor httpContextAccesso,
-            IConfiguration сonfiguration)
+            IConfiguration сonfiguration,
+            ILogger<UserService> logger,
+            IRoleRepository roleRepository)
         {
+            _claimAccessor = acessor;
             _userRepository = userRepository;
             _httpContextAccessor = httpContextAccesso;
             _сonfiguration = сonfiguration;
+            _logger = logger;
+            _roleRepository = roleRepository;
         }
 
         /// <inheritdoc />
@@ -32,10 +44,12 @@ namespace Board.Application.AppData.Contexts.Users.Services
         {
             var user = new User
             {
+
                 Name = userDto.Login,
                 Login = userDto.Login,
-                Password = userDto.Password,
-                Created = DateTime.UtcNow
+                Password = MD5GeneratorService.ProduceMD5Hash(userDto.Password),
+                Created = DateTime.UtcNow,
+                RoleId = userDto.RoleId,
             };
 
             var existingUser = await _userRepository.FindWhere(user => user.Login == userDto.Login, cancellation);
@@ -58,7 +72,7 @@ namespace Board.Application.AppData.Contexts.Users.Services
                 throw new Exception("Пользователь не найден!");
             }
 
-            if (!existingUser.Password.Equals(userDto.Password))
+            if (!existingUser.Password.Equals(MD5GeneratorService.ProduceMD5Hash(userDto.Password)))
             {
                 throw new Exception("Неверный логин или пароль.");
             }
@@ -85,6 +99,22 @@ namespace Board.Application.AppData.Contexts.Users.Services
             var result = new JwtSecurityTokenHandler().WriteToken(token);
 
             return result;
+        }
+
+        public async Task<bool> IsUserAdmin(CancellationToken cancellation)
+        {
+            var claim = await _claimAccessor.GetClaims(cancellation);
+            var claimId = claim.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrWhiteSpace(claimId))
+            {
+                throw new Exception("Не найдент пользователь с идентификаторром");
+            }
+
+            var id = Guid.Parse(claimId);
+            var user = await _userRepository.FindById(id, cancellation);
+
+            return user.Role.Id == Guid.Parse("74c8290a-450e-4206-8506-f1257d288f11");
         }
 
         /// <inheritdoc />

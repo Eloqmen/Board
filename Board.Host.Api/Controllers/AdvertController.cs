@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace Board.Host.Api.Controllers
 {
@@ -93,28 +94,24 @@ namespace Board.Host.Api.Controllers
         }
 
         /// <summary>
-        /// Обновить объявление.
+        /// Создать новое объявление.
         /// </summary>
-        /// <param name="id">Идентификатор.</param>
-        /// <param name="dto">Модель обновления объявления.</param>
+        /// <param name="dto">Модель создания объявления.</param>
         /// <param name="cancellationToken">Токен отмены.</param>
-        /// <response code="200">Запрос выполнен успешно.</response>
+        /// <response code="201">Объявление успешно создано.</response>
         /// <response code="400">Модель данных запроса невалидна.</response>
-        /// <response code="403">Доступ запрещён.</response>
-        /// <response code="404">Объявление с указанным идентификатором не найдено.</response>
         /// <response code="422">Произошёл конфликт бизнес-логики.</response>
-        /// <returns>Модель обновлённого объявления.</returns>
-        [HttpPut("{id:Guid}")]
-        [ProducesResponseType(typeof(AdvertInfoDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status422UnprocessableEntity)]
+        /// <returns>Модель созданного объявления.</returns>
         [Authorize]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAdvertDto dto, CancellationToken cancellationToken)
+        [HttpPut]
+        [ProducesResponseType(typeof(AdvertInfoDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status422UnprocessableEntity)]
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateAdvertDto model, CancellationToken cancellation)
         {
-            // TODO NotImplemented
-            return await Task.Run(() => Ok(new AdvertInfoDto()), cancellationToken);
+            _logger.LogInformation($"Запрос на обновление объявления: {JsonConvert.SerializeObject(model)}");
+            await _advertService.UpdateAdvt(id, model, Request, cancellation);
+            return Ok();
         }
 
         /// <summary>

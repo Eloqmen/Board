@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Board.Host.DbMigrator.Migrations
 {
     [DbContext(typeof(MigrationDbContext))]
-    [Migration("20230511220110_addMessage")]
-    partial class addMessage
+    [Migration("20230512114515_RoleUser")]
+    partial class RoleUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,10 +46,6 @@ namespace Board.Host.DbMigrator.Migrations
                         .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -120,6 +116,27 @@ namespace Board.Host.DbMigrator.Migrations
                     b.ToTable("Comment");
                 });
 
+            modelBuilder.Entity("Board.Domain.FavoriteAdvert", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AdvertId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvertId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FavoriteAdvert");
+                });
+
             modelBuilder.Entity("Board.Domain.File", b =>
                 {
                     b.Property<Guid>("Id")
@@ -151,6 +168,42 @@ namespace Board.Host.DbMigrator.Migrations
                     b.ToTable("File");
                 });
 
+            modelBuilder.Entity("Board.Domain.ImageAdvert", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AdvertId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvertId");
+
+                    b.ToTable("ImageAdvert");
+                });
+
             modelBuilder.Entity("Board.Domain.Message", b =>
                 {
                     b.Property<Guid>("Id")
@@ -180,6 +233,22 @@ namespace Board.Host.DbMigrator.Migrations
                     b.ToTable("Message");
                 });
 
+            modelBuilder.Entity("Board.Domain.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Role");
+                });
+
             modelBuilder.Entity("Board.Domain.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -204,7 +273,12 @@ namespace Board.Host.DbMigrator.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("User");
                 });
@@ -237,6 +311,36 @@ namespace Board.Host.DbMigrator.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Board.Domain.FavoriteAdvert", b =>
+                {
+                    b.HasOne("Board.Domain.Advert", "Advert")
+                        .WithMany()
+                        .HasForeignKey("AdvertId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Board.Domain.User", "User")
+                        .WithMany("FavoriteAdvert")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Advert");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Board.Domain.ImageAdvert", b =>
+                {
+                    b.HasOne("Board.Domain.Advert", "Ad")
+                        .WithMany("ImageAdverts")
+                        .HasForeignKey("AdvertId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ad");
+                });
+
             modelBuilder.Entity("Board.Domain.Message", b =>
                 {
                     b.HasOne("Board.Domain.User", "Reciever")
@@ -254,13 +358,36 @@ namespace Board.Host.DbMigrator.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("Board.Domain.User", b =>
+                {
+                    b.HasOne("Board.Domain.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Board.Domain.Advert", b =>
+                {
+                    b.Navigation("ImageAdverts");
+                });
+
             modelBuilder.Entity("Board.Domain.Category", b =>
                 {
                     b.Navigation("Adverts");
                 });
 
+            modelBuilder.Entity("Board.Domain.Role", b =>
+                {
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("Board.Domain.User", b =>
                 {
+                    b.Navigation("FavoriteAdvert");
+
                     b.Navigation("RecievedComments");
 
                     b.Navigation("RecievedMessages");

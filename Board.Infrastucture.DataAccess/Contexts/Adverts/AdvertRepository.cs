@@ -41,6 +41,18 @@ namespace Board.Infrastucture.DataAccess.Contexts.Adverts
             return _mapper.Map<AdvertInfoDto>(entity);
         }
 
+        /// <inheritdoc />
+        public async Task UpdateAdvtEntity(Advert entity, CancellationToken cancellation)
+        {
+            var advtEntity = await _repository.GetByIdAsync(entity.Id, cancellation);
+            entity.Created = advtEntity.Created;
+            advtEntity.Description = entity.Description;
+            advtEntity.Name = entity.Name;
+            advtEntity.Price = entity.Price;
+
+            await _repository.UpdateAsync(advtEntity, cancellation);
+        }
+
         public async Task Delete(Guid id, CancellationToken cancellationToken)
         {
             var entity = await _repository.GetAll().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);

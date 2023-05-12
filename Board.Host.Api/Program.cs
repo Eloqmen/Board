@@ -13,11 +13,14 @@ using Board.Application.AppData.Contexts.ImageAdverts.Repositories;
 using Board.Application.AppData.Contexts.ImageAdverts.Services;
 using Board.Application.AppData.Contexts.Messages.Repositories;
 using Board.Application.AppData.Contexts.Messages.Services;
+using Board.Application.AppData.Contexts.Roles.Repositories;
+using Board.Application.AppData.Contexts.Roles.Services;
 using Board.Application.AppData.Contexts.Users.Repositories;
 using Board.Application.AppData.Contexts.Users.Services;
 using Board.Application.AppData.Services;
 using Board.Contracts.Advert;
 using Board.Contracts.Interfaces;
+using Board.Infastructure.Identity;
 using Board.Infastructure.MapProfiles;
 using Board.Infastructure.Repository;
 using Board.Infrastucture.DataAccess;
@@ -28,6 +31,7 @@ using Board.Infrastucture.DataAccess.Contexts.FavoriteAdverts;
 using Board.Infrastucture.DataAccess.Contexts.Files;
 using Board.Infrastucture.DataAccess.Contexts.ImageAdverts;
 using Board.Infrastucture.DataAccess.Contexts.Messages;
+using Board.Infrastucture.DataAccess.Contexts.Roles;
 using Board.Infrastucture.DataAccess.Contexts.Users;
 using Board.Infrastucture.DataAccess.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,6 +65,7 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IFavoriteAdvertRepository, FavoriteAdvertRepository>();
 builder.Services.AddScoped<IImageAdvertRepository, ImageAdvertRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 
 // Add services to the container.
@@ -73,6 +78,8 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IFavoriteAdvertService, FavoriteAdvertService>();
 builder.Services.AddScoped<IImageAdvertService, ImageAdvertService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IClaimAcessor, HttpContextClaimAcessor>();
 
 
 builder.Services.AddSingleton<IMapper>(new Mapper(GetMapperConfiguration()));
@@ -108,14 +115,13 @@ builder.Services.AddAuthorization();
 
 #endregion
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Advert Api", Version = "V1" });
-    //options.IncludeXmlComments(Path.Combine(Path.Combine(AppContext.BaseDirectory,
-    //    $"{typeof(CreateAdvertDto).Assembly.GetName().Name}.xml")));
-    //options.IncludeXmlComments(Path.Combine(Path.Combine(AppContext.BaseDirectory, "Documentation.xml")));
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Board Api", Version = "V1" });
+    options.IncludeXmlComments(Path.Combine(Path.Combine(AppContext.BaseDirectory,
+        $"{typeof(CreateAdvertDto).Assembly.GetName().Name}.xml")));
+    options.IncludeXmlComments(Path.Combine(Path.Combine(AppContext.BaseDirectory, "Documentation.xml")));
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

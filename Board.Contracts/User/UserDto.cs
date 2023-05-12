@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Board.Contracts.Roles;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -32,6 +33,10 @@ namespace Board.Contracts.User
         /// </summary>
         public bool IsBlocked { get; set; }
 
+        /// <summary>
+        /// Роль пользователя
+        /// </summary>
+        public InfoRoleDto Role { get; set; }
 
         public bool IsAuthenticated { get; set; }
         public string Scheme { get; set; }

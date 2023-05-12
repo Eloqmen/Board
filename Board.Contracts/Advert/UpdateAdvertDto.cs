@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Board.Contracts.Advert
 {
-    public class UpdateAdvertDto : CreateAdvertDto
+    public class UpdateAdvertDto
     {
+        public AdvertInfoDto CreateAdvertDto {get; set;}
     }
 }

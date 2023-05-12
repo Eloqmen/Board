@@ -31,5 +31,12 @@ namespace Board.Application.AppData.Contexts.Users.Services
         /// <param name="cancellation">Токен отмены.</param>
         /// <returns>Текущий пользователь.</returns>
         Task<UserDto> GetCurrentAsync(CancellationToken cancellation);
+
+        /// <summary>
+        /// Проверка является ли авторизованный пользователь администратором
+        /// </summary>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        public Task<bool> IsUserAdmin(CancellationToken cancellation);
     }
 }

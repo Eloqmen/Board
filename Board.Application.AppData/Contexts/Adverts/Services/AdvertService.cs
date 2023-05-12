@@ -2,6 +2,7 @@
 using Board.Application.AppData.Contexts.Adverts.Repositories;
 using Board.Contracts.Advert;
 using Board.Domain;
+using Microsoft.AspNetCore.Http;
 
 namespace Board.Application.AppData.Contexts.Adverts.Services
 {
@@ -34,6 +35,13 @@ namespace Board.Application.AppData.Contexts.Adverts.Services
         {
             Advert entity = _mapper.Map<Advert>(dto);
             return _advertRepository.Add(entity, cancellationToken);
+        }
+
+        public async Task UpdateAdvt(Guid id, UpdateAdvertDto model, HttpRequest Request, CancellationToken cancellation)
+        {
+            model.CreateAdvertDto.Id = id;
+            var advert = _mapper.Map<Advert>(model.CreateAdvertDto);
+            await _advertRepository.UpdateAdvtEntity(advert, cancellation);
         }
 
         /// <inheritdoc />

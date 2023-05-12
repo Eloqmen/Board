@@ -33,5 +33,11 @@ namespace Board.Contracts.User
         /// </summary>
         [RegularExpression(@"^.+\@.+\..+$")]
         public string Email { get; set; }
+
+        /// <summary>
+        /// ID Роли
+        /// </summary>
+        public Guid RoleId { get; set; }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Board.Application.AppData.Contexts.Categories.Services;
+using Board.Application.AppData.Contexts.Users.Services;
 using Board.Contracts;
 using Board.Contracts.Category;
 using Microsoft.AspNetCore.Authorization;
@@ -20,16 +21,18 @@ namespace Board.Host.Api.Controllers
     {
         private readonly ILogger<CategoryController> _logger;
         private readonly ICategoryService _categoryService;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Инициализирует экземпляр <see cref="CategoryController"/>
         /// </summary>
         /// <param name="logger">Сервис логирования.</param>
         /// <param name="categoryService">Сервис категорий.</param>
-        public CategoryController(ILogger<CategoryController> logger, ICategoryService categoryService)
+        public CategoryController(ILogger<CategoryController> logger, ICategoryService categoryService, IUserService userService)
         {
             _logger = logger;
             _categoryService = categoryService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -163,6 +166,8 @@ namespace Board.Host.Api.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteById(Guid id, CancellationToken cancellationToken)
         {
+            if (!await _userService.IsUserAdmin(cancellationToken))
+                throw new Exception("У вас недостаточно прав для данного действия!");
             return await Task.Run(NoContent, cancellationToken);
         }
     }

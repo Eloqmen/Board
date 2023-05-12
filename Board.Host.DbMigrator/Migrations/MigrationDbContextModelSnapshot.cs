@@ -230,6 +230,22 @@ namespace Board.Host.DbMigrator.Migrations
                     b.ToTable("Message");
                 });
 
+            modelBuilder.Entity("Board.Domain.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Role");
+                });
+
             modelBuilder.Entity("Board.Domain.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -254,7 +270,12 @@ namespace Board.Host.DbMigrator.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("User");
                 });
@@ -334,6 +355,17 @@ namespace Board.Host.DbMigrator.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("Board.Domain.User", b =>
+                {
+                    b.HasOne("Board.Domain.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("Board.Domain.Advert", b =>
                 {
                     b.Navigation("ImageAdverts");
@@ -342,6 +374,11 @@ namespace Board.Host.DbMigrator.Migrations
             modelBuilder.Entity("Board.Domain.Category", b =>
                 {
                     b.Navigation("Adverts");
+                });
+
+            modelBuilder.Entity("Board.Domain.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Board.Domain.User", b =>

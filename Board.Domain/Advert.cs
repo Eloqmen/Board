@@ -56,6 +56,6 @@ namespace Board.Domain
         /// <summary>
         /// Категория.
         /// </summary>
-        public virtual Category Category { get; set; }
+        public Category Category { get; set; }
     }
 }

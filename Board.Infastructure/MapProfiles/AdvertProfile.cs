@@ -37,6 +37,7 @@ namespace Board.Infastructure.MapProfiles
                 .ForMember(d => d.Address, map => map.MapFrom(s => s.Address))
                 .ForMember(d => d.CreatedAt, map => map.MapFrom(s => s.Created))
                 .ForMember(d => d.IsActive, map => map.MapFrom(s => s.IsActive));
+
         }
     }
 }

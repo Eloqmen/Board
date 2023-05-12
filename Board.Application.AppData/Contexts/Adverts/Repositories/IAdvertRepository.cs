@@ -32,6 +32,13 @@ namespace Board.Application.AppData.Contexts.Adverts.Repositories
         Task<AdvertInfoDto> Add(Advert entity, CancellationToken cancellation);
 
         /// <summary>
+        /// Обновляет данные объявления.
+        /// </summary>
+        /// <param name="entity">Объявление <see cref="AdvtEntity"/>.</param>
+        /// <param name="cancellation">Маркер отмены.</param>
+        public Task UpdateAdvtEntity(Advert entity, CancellationToken cancellation);
+
+        /// <summary>
         /// Удалить объявление.
         /// </summary>
         /// <param name="id">Идентификатор объявления.</param>

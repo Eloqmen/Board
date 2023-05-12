@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,17 @@ namespace Board.Domain
         /// Дата регистрации.
         /// </summary>
         public DateTime Created { get; set; }
+
+        /// <summary>
+        /// ID Роли пользователя
+        /// </summary>
+        public Guid RoleId { get; set; }
+
+        /// <summary>
+        /// Роль пользователя
+        /// </summary>
+        [ForeignKey("RoleId")]
+        public Role Role { get; set; }
 
         /// <summary>
         /// Отправленные сообщения

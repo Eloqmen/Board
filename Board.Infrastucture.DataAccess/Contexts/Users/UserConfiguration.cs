@@ -20,6 +20,7 @@ namespace Board.Infrastucture.DataAccess.Contexts.Users
             builder.Property(a => a.Login).HasMaxLength(50).IsRequired();
             builder.Property(a => a.Password).HasMaxLength(50).IsRequired();
             builder.Property(a => a.Created).HasConversion(s => s, s => DateTime.SpecifyKind(s, DateTimeKind.Utc));
+            builder.HasOne(u => u.Role).WithMany(r => r.Users).HasForeignKey(f => f.RoleId);
         }
     }
 }

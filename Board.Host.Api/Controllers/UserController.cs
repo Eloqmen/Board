@@ -87,16 +87,18 @@ namespace Board.Host.Api.Controllers
         [HttpPost("GetUserInfo")]
         public async Task<UserDto> GetUserInfo(CancellationToken cancellation)
         {
+            new UserDto
+            {
+                Scheme = HttpContext.User.Identity.AuthenticationType,
+                IsAuthenticated = HttpContext.User.Identity.IsAuthenticated,
+                Claims = HttpContext.User.Claims.ToList()
+            };
+
             var result = await _userService.GetCurrentAsync(cancellation);
 
             return result;
 
-            //new UserDto
-            //{
-            //    Scheme = HttpContext.User.Identity.AuthenticationType,
-            //    IsAuthenticated = HttpContext.User.Identity.IsAuthenticated,
-            //    Claims = HttpContext.User.Claims.ToList()
-            //};
+            
         }
     }
 }
