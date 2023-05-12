@@ -8,9 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Contexts\Categories\Repositories\" />
-    <Folder Include="Contexts\Comments\Services\" />
-    <Folder Include="Contexts\Messages\Repositories\" />
-    <Folder Include="Contexts\Messages\Services\" />
   </ItemGroup>
 
   <ItemGroup>

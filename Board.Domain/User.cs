@@ -35,5 +35,30 @@ namespace Board.Domain
         /// Дата регистрации.
         /// </summary>
         public DateTime Created { get; set; }
+
+        /// <summary>
+        /// Отправленные сообщения
+        /// </summary>
+        public ICollection<Message> SendedMessages { get; set; }
+
+        /// <summary>
+        /// Полученные сообщения
+        /// </summary>
+        public ICollection<Message> RecievedMessages { get; set; }
+
+        /// <summary>
+        /// Отзывы оставленные пользователю
+        /// </summary>
+        public ICollection<Comment> SendedComments { get; set; }
+
+        /// <summary>
+        /// Отзывы оставленные пользователю
+        /// </summary>
+        public ICollection<Comment> RecievedComments { get; set; }
+
+        /// <summary>
+        /// Избранные объявления пользователя
+        /// </summary>
+        public ICollection<FavoriteAdvert> FavoriteAdvert { get; set; }
     }
 }

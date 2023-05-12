@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Board.Host.DbMigrator.Migrations
 {
     [DbContext(typeof(MigrationDbContext))]
-    [Migration("20230511004924_AddNewEntity2")]
-    partial class AddNewEntity2
+    [Migration("20230511220110_addMessage")]
+    partial class addMessage
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,7 +83,8 @@ namespace Board.Host.DbMigrator.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
@@ -91,6 +92,32 @@ namespace Board.Host.DbMigrator.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("Board.Domain.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("Board.Domain.File", b =>
@@ -122,6 +149,35 @@ namespace Board.Host.DbMigrator.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("File");
+                });
+
+            modelBuilder.Entity("Board.Domain.Message", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Containment")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<Guid>("RecieverId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SendDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecieverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("Board.Domain.User", b =>
@@ -164,9 +220,54 @@ namespace Board.Host.DbMigrator.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Board.Domain.Comment", b =>
+                {
+                    b.HasOne("Board.Domain.User", "Sender")
+                        .WithMany("SendedComments")
+                        .HasForeignKey("SenderId")
+                        .IsRequired();
+
+                    b.HasOne("Board.Domain.User", "User")
+                        .WithMany("RecievedComments")
+                        .HasForeignKey("UserId")
+                        .IsRequired();
+
+                    b.Navigation("Sender");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Board.Domain.Message", b =>
+                {
+                    b.HasOne("Board.Domain.User", "Reciever")
+                        .WithMany("RecievedMessages")
+                        .HasForeignKey("RecieverId")
+                        .IsRequired();
+
+                    b.HasOne("Board.Domain.User", "Sender")
+                        .WithMany("SendedMessages")
+                        .HasForeignKey("SenderId")
+                        .IsRequired();
+
+                    b.Navigation("Reciever");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("Board.Domain.Category", b =>
                 {
                     b.Navigation("Adverts");
+                });
+
+            modelBuilder.Entity("Board.Domain.User", b =>
+                {
+                    b.Navigation("RecievedComments");
+
+                    b.Navigation("RecievedMessages");
+
+                    b.Navigation("SendedComments");
+
+                    b.Navigation("SendedMessages");
                 });
 #pragma warning restore 612, 618
         }

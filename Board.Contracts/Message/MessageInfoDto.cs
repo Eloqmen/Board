@@ -20,12 +20,12 @@ namespace Board.Contracts.Message
         /// <summary>
         /// Отправитель
         /// </summary>
-        public UserDto Sender { get; set; }
+        public Guid SenderId { get; set; }
 
         /// <summary>
         /// Получатель
         /// </summary>
-        public UserDto Reciever { get; set; }
+        public Guid RecieverId { get; set; }
 
         /// <summary>
         /// Содержимое сообщения

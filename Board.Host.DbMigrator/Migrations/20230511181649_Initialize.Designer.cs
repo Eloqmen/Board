@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Board.Host.DbMigrator.Migrations
 {
     [DbContext(typeof(MigrationDbContext))]
-    [Migration("20230510230740_AddNewEntity")]
-    partial class AddNewEntity
+    [Migration("20230511181649_Initialize")]
+    partial class Initialize
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,7 +83,8 @@ namespace Board.Host.DbMigrator.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
@@ -91,6 +92,32 @@ namespace Board.Host.DbMigrator.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("Board.Domain.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("Board.Domain.File", b =>
@@ -124,6 +151,35 @@ namespace Board.Host.DbMigrator.Migrations
                     b.ToTable("File");
                 });
 
+            modelBuilder.Entity("Board.Domain.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User");
+                });
+
             modelBuilder.Entity("Board.Domain.Advert", b =>
                 {
                     b.HasOne("Board.Domain.Category", "Category")
@@ -135,9 +191,33 @@ namespace Board.Host.DbMigrator.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Board.Domain.Comment", b =>
+                {
+                    b.HasOne("Board.Domain.User", "Sender")
+                        .WithMany("SendedComments")
+                        .HasForeignKey("SenderId")
+                        .IsRequired();
+
+                    b.HasOne("Board.Domain.User", "User")
+                        .WithMany("RecievedComments")
+                        .HasForeignKey("UserId")
+                        .IsRequired();
+
+                    b.Navigation("Sender");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Board.Domain.Category", b =>
                 {
                     b.Navigation("Adverts");
+                });
+
+            modelBuilder.Entity("Board.Domain.User", b =>
+                {
+                    b.Navigation("RecievedComments");
+
+                    b.Navigation("SendedComments");
                 });
 #pragma warning restore 612, 618
         }

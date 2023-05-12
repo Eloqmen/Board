@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Board.Domain;
 
 namespace Board.Infrastucture.DataAccess.Contexts.Categories
 {
     /// <summary>
     /// Конфигурация сущности категории.
     /// </summary>
-    public class CategoryConfiguration
+    public class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
         public void Configure(EntityTypeBuilder<Domain.Category> builder)
         {

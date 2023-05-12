@@ -14,28 +14,19 @@ namespace Board.Contracts.FavoriteAdvert
     public class FavoriteAdvertInfoDto
     {
         /// <summary>
-        /// Id Избранного объявления
+        /// Индификатор Избранного объявления
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// ID Пользователя добавившего объявление в избранные
+        /// Индификатор Пользователя добавившего объявление в избранные
         /// </summary>
         public Guid UserId { get; set; }
 
         /// <summary>
-        /// Пользователь добавивший объявление в избранные
+        /// Индификатор Объявления
         /// </summary>
-        public UserDto User { get; set; }
+        public Guid AdvertId { set; get; }
 
-        /// <summary>
-        /// ID Объявления
-        /// </summary>
-        public Guid AdId { set; get; }
-
-        /// <summary>
-        /// Объявление
-        /// </summary>
-        public AdvertShortInfoDto Advert { get; set; }
     }
 }

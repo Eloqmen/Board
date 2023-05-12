@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Board.Domain
 {
     /// <summary>
-    /// Объявление
+    /// Объявление.
     /// </summary>
     public class Advert
     {
@@ -29,11 +29,6 @@ namespace Board.Domain
         public decimal? Price { get; set; }
 
         /// <summary>
-        /// Ссылка на изображение.
-        /// </summary>
-        public string ImageUrl { get; set; }
-
-        /// <summary>
         /// Полный адрес.
         /// </summary>
         public string Address { get; set; }
@@ -42,6 +37,11 @@ namespace Board.Domain
         /// Признак актуальности.
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Фотографии объявления
+        /// </summary>
+        public ICollection<ImageAdvert> ImageAdverts { get; set; }
 
         /// <summary>
         /// Дата/время создания (UTC).

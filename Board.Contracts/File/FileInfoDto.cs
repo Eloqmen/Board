@@ -30,5 +30,6 @@ namespace Board.Contracts.File
         /// Размер файла.
         /// </summary>
         public int Length { get; set; }
+
     }
 }

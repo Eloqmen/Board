@@ -3,8 +3,16 @@ using Board.Application.AppData.Contexts.Adverts.Repositories;
 using Board.Application.AppData.Contexts.Adverts.Services;
 using Board.Application.AppData.Contexts.Categories.Repositories;
 using Board.Application.AppData.Contexts.Categories.Services;
+using Board.Application.AppData.Contexts.Comments.Repositories;
+using Board.Application.AppData.Contexts.Comments.Services;
+using Board.Application.AppData.Contexts.FavoriteAdverts.Repositories;
+using Board.Application.AppData.Contexts.FavoriteAdverts.Services;
 using Board.Application.AppData.Contexts.Files.Repositories;
 using Board.Application.AppData.Contexts.Files.Services;
+using Board.Application.AppData.Contexts.ImageAdverts.Repositories;
+using Board.Application.AppData.Contexts.ImageAdverts.Services;
+using Board.Application.AppData.Contexts.Messages.Repositories;
+using Board.Application.AppData.Contexts.Messages.Services;
 using Board.Application.AppData.Contexts.Users.Repositories;
 using Board.Application.AppData.Contexts.Users.Services;
 using Board.Application.AppData.Services;
@@ -15,7 +23,11 @@ using Board.Infastructure.Repository;
 using Board.Infrastucture.DataAccess;
 using Board.Infrastucture.DataAccess.Contexts.Adverts;
 using Board.Infrastucture.DataAccess.Contexts.Categories;
+using Board.Infrastucture.DataAccess.Contexts.Comments;
+using Board.Infrastucture.DataAccess.Contexts.FavoriteAdverts;
 using Board.Infrastucture.DataAccess.Contexts.Files;
+using Board.Infrastucture.DataAccess.Contexts.ImageAdverts;
+using Board.Infrastucture.DataAccess.Contexts.Messages;
 using Board.Infrastucture.DataAccess.Contexts.Users;
 using Board.Infrastucture.DataAccess.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,6 +35,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.ComponentModel;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +57,10 @@ builder.Services.AddScoped<IAdvertRepository, AdvertRepository>();
 builder.Services.AddScoped<IFileRepository, FileRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IFavoriteAdvertRepository, FavoriteAdvertRepository>();
+builder.Services.AddScoped<IImageAdvertRepository, ImageAdvertRepository>();
 
 
 // Add services to the container.
@@ -52,6 +69,10 @@ builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IForbiddenWordsService, ForbiddenWordsService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IFavoriteAdvertService, FavoriteAdvertService>();
+builder.Services.AddScoped<IImageAdvertService, ImageAdvertService>();
 
 
 builder.Services.AddSingleton<IMapper>(new Mapper(GetMapperConfiguration()));
@@ -92,9 +113,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Advert Api", Version = "V1" });
-    options.IncludeXmlComments(Path.Combine(Path.Combine(AppContext.BaseDirectory,
-        $"{typeof(CreateAdvertDto).Assembly.GetName().Name}.xml")));
-    options.IncludeXmlComments(Path.Combine(Path.Combine(AppContext.BaseDirectory, "Documentation.xml")));
+    //options.IncludeXmlComments(Path.Combine(Path.Combine(AppContext.BaseDirectory,
+    //    $"{typeof(CreateAdvertDto).Assembly.GetName().Name}.xml")));
+    //options.IncludeXmlComments(Path.Combine(Path.Combine(AppContext.BaseDirectory, "Documentation.xml")));
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -159,6 +180,10 @@ static MapperConfiguration GetMapperConfiguration()
         cfg.AddProfile<AdvertProfile>();
         cfg.AddProfile<CategoryProfile>();
         cfg.AddProfile<FileProfile>();
+        cfg.AddProfile<CommentProfile>();
+        cfg.AddProfile<MessageProfile>();
+        cfg.AddProfile<FavoriteAdvertProfile>();
+        cfg.AddProfile<ImageAdvertProfile>();
     });
     configuration.AssertConfigurationIsValid();
     return configuration;

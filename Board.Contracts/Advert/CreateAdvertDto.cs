@@ -35,13 +35,6 @@ namespace Board.Contracts.Advert
         public Guid? CategoryId { get; set; }
 
         /// <summary>
-        /// Ссылка на изображение.
-        /// </summary>
-        [StringLength(250)]
-        [ForbiddenWordsValidation]
-        public string ImageUrl { get; set; }
-
-        /// <summary>
         /// Цена.
         /// </summary>
         public decimal? Price { get; set; }

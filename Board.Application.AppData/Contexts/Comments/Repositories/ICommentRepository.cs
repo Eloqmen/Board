@@ -1,11 +1,5 @@
-﻿using Board.Contracts.Advert;
-using Board.Contracts.Comment;
+﻿using Board.Contracts.Comment;
 using Board.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Board.Application.AppData.Contexts.Comments.Repositories
 {
@@ -35,7 +29,7 @@ namespace Board.Application.AppData.Contexts.Comments.Repositories
         /// <param name="entity">Коментарий.</param>
         /// <param name="cancellation">Токен отмены операции.</param>
         /// <returns>Модель добавленного коментария.</returns>
-        Task<CreateCommentDto> Add(Advert entity, CancellationToken cancellation);
+        Task<CommentInfoDto> Add(Comment entity, CancellationToken cancellation);
 
         /// <summary>
         /// Удалить коментарии.

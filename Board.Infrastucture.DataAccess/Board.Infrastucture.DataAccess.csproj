@@ -23,9 +23,4 @@
     <ProjectReference Include="..\Board.Infastructure\Board.Infastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Contexts\Comments\" />
-    <Folder Include="Contexts\FavoriteAdverts\" />
-  </ItemGroup>
-
 </Project>

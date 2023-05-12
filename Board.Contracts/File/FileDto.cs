@@ -25,5 +25,6 @@ namespace Board.Contracts.File
         /// ContentType файла.
         /// </summary>
         public string ContentType { get; set; }
+
     }
 }
