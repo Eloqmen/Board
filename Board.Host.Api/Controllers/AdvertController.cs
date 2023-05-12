@@ -94,14 +94,14 @@ namespace Board.Host.Api.Controllers
         }
 
         /// <summary>
-        /// Создать новое объявление.
+        /// Обновить новое объявление.
         /// </summary>
-        /// <param name="dto">Модель создания объявления.</param>
+        /// <param name="dto">Модель обновления объявления.</param>
         /// <param name="cancellationToken">Токен отмены.</param>
-        /// <response code="201">Объявление успешно создано.</response>
+        /// <response code="201">Объявление успешно обновлено.</response>
         /// <response code="400">Модель данных запроса невалидна.</response>
         /// <response code="422">Произошёл конфликт бизнес-логики.</response>
-        /// <returns>Модель созданного объявления.</returns>
+        /// <returns>Модель обновление объявления.</returns>
         [Authorize]
         [HttpPut]
         [ProducesResponseType(typeof(AdvertInfoDto), StatusCodes.Status201Created)]
